@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Machine Learning Mastery Course</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0d1117;
+            color: #00ff41;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .text-neon-green { color: #00ff41; }
+        .bg-matrix-green { background-color: #004d00; }
+        .border-neon-green { border-color: #00ff41; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background-color: #00ff41;
+            box-shadow: 0 0 10px #00ff41, 0 0 5px #00ff41;
+            transition: width 0.5s ease-in-out;
+            z-index: 50;
+        }
+
+        .nav-item.active {
+            background-color: #004d00;
+        }
+        .quiz-option {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .quiz-option:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 5px #00ff41;
+        }
+        .explanation {
+            font-size: 0.875rem;
+            color: #00e63c;
+        }
+        .correct-answer {
+            background-color: #008000;
+        }
+        .incorrect-answer {
+            background-color: #b30000;
+        }
+        pre {
+            background-color: #001a00;
+            border: 1px solid #00ff41;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+        .module-content h2, .module-content h3 {
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+        }
+        .jupyter-markdown {
+            background-color: #001a00;
+            border: 1px solid #00ff41;
+        }
+        .jupyter-code {
+            background-color: #0d1117;
+            border: 1px solid #00ff41;
+        }
+        .quiz-container {
+            border: 1px solid #00ff41;
+        }
+
+        /* --- Presentation Styling --- */
+        #presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: #0d1117;
+        }
+        .module-slide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 90%;
+            max-width: 1000px;
+            transform: translate(-50%, -50%) scale(0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.8s ease-in-out;
+            background-color: #001a00;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 0 20px #00ff41;
+            z-index: 10;
+        }
+        .module-slide.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+        .slide-button {
+            background-color: #004d00;
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+        }
+        .slide-button:hover {
+            box-shadow: 0 0 10px #00ff41;
+        }
+        .gemini-explain-button {
+            background-color: #00ff41;
+            color: #0d1117;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        .gemini-explain-button:hover {
+            transform: scale(1.1);
+        }
+        #gemini-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background-color: #001a00;
+            color: #00ff41;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 0 20px #00ff41;
+        }
+        #modal-close-button {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="flex flex-col lg:flex-row gap-8 container mx-auto rounded-lg shadow-lg p-8">
+        
+        <!-- Navigation Menu -->
+        <div class="absolute top-4 left-4 z-50">
+            <button id="menu-button" class="slide-button">Modules</button>
+            <div id="nav-menu" class="hidden absolute top-12 left-0 bg-matrix-green rounded-lg p-2 shadow-lg z-50 border border-neon-green">
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="block py-2 px-4 rounded-md text-neon-green hover:bg-gray-700 transition-colors nav-item" data-target="module1">Module 1</a></li>
+                    <li><a href="#" class="block py-2 px-4 rounded-md text-neon-green hover:bg-gray-700 transition-colors nav-item" data-target="module2">Module 2</a></li>
+                    <li><a href="#" class="block py-2 px-4 rounded-md text-neon-green hover:bg-gray-700 transition-colors nav-item" data-target="module3">Module 3</a></li>
+                    <li><a href="#" class="block py-2 px-4 rounded-md text-neon-green hover:bg-gray-700 transition-colors nav-item" data-target="module4">Module 4</a></li>
+                    <li><a href="#" class="block py-2 px-4 rounded-md text-neon-green hover:bg-gray-700 transition-colors nav-item" data-target="module5">Module 5</a></li>
+                    <li><a href="#" class="block py-2 px-4 rounded-md text-neon-green hover:bg-gray-700 transition-colors nav-item" data-target="module6">Module 6</a></li>
+                    <li><a href="#" class="block py-2 px-4 rounded-md text-neon-green hover:bg-gray-700 transition-colors nav-item" data-target="workbooks">Workbooks</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <main class="w-full h-full">
+            <div id="presentation-container" class="p-6">
+                <!-- Module 1 Content -->
+                <div id="module1" class="module-slide active">
+                    <h2 class="text-3xl font-bold mb-4">Module 1: AI/ML Foundations</h2>
+                    <div class="prose text-neon-green max-w-none">
+                        <h3 class="text-2xl font-bold mt-6 mb-2">What is AI?</h3>
+                        <p>Artificial Intelligence (AI) is a broad field of computer science that gives machines the ability to perform tasks that typically require human intelligence. It is a collection of techniques and algorithms that allow machines to mimic and even surpass human cognitive functions.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Machine Learning (ML)</h3>
+                        <p><strong>Machine Learning (ML)</strong> is a subset of AI that focuses on building systems that can learn from and make decisions based on data. Instead of being explicitly programmed with rules, an ML model is trained on a large dataset to identify patterns and relationships. This allows it to make predictions or decisions about new, unseen data.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Types of Learning</h3>
+                        <p><strong>Supervised Learning:</strong> The model is trained on a labeled dataset. Example: Training a model to identify spam emails.</p>
+                        <p><strong>Unsupervised Learning:</strong> The model is trained on an unlabeled dataset to find hidden patterns or structures. Example: Grouping customers into different segments based on purchasing behavior.</p>
+                        <p><strong>Reinforcement Learning:</strong> The model learns by interacting with an environment and receiving rewards or penalties. Example: Training a self-driving car.</p>
+                        <p>Think of it as a set of nested concepts: AI is the largest, ML is inside AI, and Deep Learning (DL) is inside ML.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Environment Setup</h3>
+                        <p>To get started, you will need to set up a proper environment with Python and Jupyter Notebooks, and essential libraries like NumPy and Pandas.</p>
+                    </div>
+                </div>
+
+                <!-- Module 2 Content -->
+                <div id="module2" class="module-slide">
+                    <h2 class="text-3xl font-bold mb-4">Module 2: Core Machine Learning</h2>
+                    <div class="prose text-neon-green max-w-none">
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Data Preprocessing</h3>
+                        <p>This module delves into the fundamental concepts of Machine Learning, building upon the introductory knowledge from Module 1. We will cover essential steps in the ML workflow, from preparing your data to evaluating your models.</p>
+                        <p><strong>Data Preprocessing</strong> is a crucial step in any ML project. It involves cleaning, organizing, and transforming raw data into a suitable format. Key steps include: Handling Missing Values, Data Transformation (Scaling/Encoding), and Feature Engineering.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Supervised Learning: Regression & Classification</h3>
+                        <p><strong>Regression</strong> is used for predicting a continuous output value (e.g., house prices). <strong>Classification</strong> is used for predicting a categorical output (e.g., spam/not spam).</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Model Evaluation Metrics</h3>
+                        <p><strong>Model Evaluation Metrics</strong> are essential. We use different metrics for different types of problems:</p>
+                        <ul>
+                            <li>For Regression: Mean Squared Error (MSE), R-squared.</li>
+                            <li>For Classification: Accuracy, Precision, Recall, F1-Score, Confusion Matrix.</li>
+                        </ul>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Overfitting and Underfitting</h3>
+                        <p>These two common problems are related to the **bias-variance trade-off**. Overfitting happens when a model learns the training data too well, while underfitting occurs when the model is too simple to capture the underlying patterns.</p>
+                    </div>
+                </div>
+
+                <!-- Module 3 Content -->
+                <div id="module3" class="module-slide">
+                    <h2 class="text-3xl font-bold mb-4">Module 3: Deep Learning</h2>
+                    <div class="prose text-neon-green max-w-none">
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Introduction to Neural Networks</h3>
+                        <p>Deep Learning is a powerful subset of Machine Learning that uses artificial neural networks with multiple layers to learn complex patterns.</p>
+                        <p>A neural network is a series of algorithms that recognizes underlying relationships in data. It consists of layers of neurons, with each connection having a weight and a bias. Non-linear **activation functions** like **ReLU** and **Softmax** are applied to the output of each neuron.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Backpropagation and Gradient Descent</h3>
+                        <p>The learning process involves two key algorithms: **Gradient Descent**, which finds the minimum of a function, and **Backpropagation**, which efficiently calculates the gradients to update the network's weights and biases.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Building with TensorFlow/Keras</h3>
+                        <p>TensorFlow is an open-source framework, and Keras is a high-level API that simplifies building and training deep learning models on top of it.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Convolutional Neural Networks (CNNs)</h3>
+                        <p>CNNs are specialized for processing images. They use **convolutional layers** to extract features, **pooling layers** to reduce dimensions, and fully connected layers for classification.</p>
+                    </div>
+                </div>
+
+                <!-- Module 4 Content -->
+                <div id="module4" class="module-slide">
+                    <h2 class="text-3xl font-bold mb-4">Module 4: Natural Language Processing</h2>
+                    <div class="prose text-neon-green max-w-none">
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Text Preprocessing</h3>
+                        <p>Natural Language Processing (NLP) is a subfield of AI that focuses on enabling computers to understand, interpret, and generate human language.</p>
+                        <p><strong>Text Preprocessing</strong> is a crucial step before any NLP task. Key steps include: **Tokenization**, **Lowercasing**, **Stop Word Removal**, **Stemming** (a crude word-root reduction), and **Lemmatization** (a more sophisticated word-root reduction considering context).</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Word Embeddings</h3>
+                        <p><strong>Word Embeddings</strong> are numerical representations of words that capture their semantic meaning. Words with similar meanings have similar numerical representations.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Introduction to Transformers</h3>
+                        <p>The **Transformer** is a revolutionary neural network architecture that uses a **Self-Attention Mechanism** to weigh the importance of different words in a sequence, allowing models to capture contextual relationships. Models like BERT and GPT are built upon this architecture.</p>
+                    </div>
+                </div>
+
+                <!-- Module 5 Content -->
+                <div id="module5" class="module-slide">
+                    <h2 class="text-3xl font-bold mb-4">Module 5: Computer Vision</h2>
+                    <div class="prose text-neon-green max-w-none">
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Image Basics</h3>
+                        <p>Computer Vision (CV) is a field of AI that enables computers to "see" and interpret digital images and videos.</p>
+                        <p>An image is a grid of **pixels**. Images have a **resolution** (e.g., 1920x1080) and are often represented using color models like **RGB**, which has three channels (Red, Green, Blue).</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Image Preprocessing</h3>
+                        <p><strong>Image Preprocessing</strong> includes:</p>
+                        <ul>
+                            <li><strong>Resizing:</strong> To a uniform size required by models.</li>
+                            <li><strong>Normalization:</strong> Scaling pixel values to a range (e.g., 0-1) for faster training.</li>
+                            <li><strong>Augmentation:</strong> Creating new training examples by transforming existing images (e.g., rotation, flipping) to prevent overfitting.</li>
+                        </ul>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Object Detection and Image Segmentation</h3>
+                        <p><strong>Object Detection</strong> involves identifying and locating objects with bounding boxes. **Image Segmentation** goes further by partitioning an image into multiple regions, often down to the pixel level. </p>
+                    </div>
+                </div>
+
+                <!-- Module 6 Content -->
+                <div id="module6" class="module-slide">
+                    <h2 class="text-3xl font-bold mb-4">Module 6: Advanced Topics</h2>
+                    <div class="prose text-neon-green max-w-none">
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Reinforcement Learning (RL)</h3>
+                        <p>This final module introduces several advanced and modern topics in AI and Machine Learning.</p>
+                        <p><strong>Reinforcement Learning (RL)</strong> is a type of machine learning where an **agent** learns to make decisions by performing actions in an **environment** to maximize a cumulative **reward**. Think of it like training a dog with treats and penalties.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Generative AI</h3>
+                        <p><strong>Generative AI</strong> is a field focused on creating new, original content. Key models include **Generative Adversarial Networks (GANs)** and **Large Language Models (LLMs)**.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">MLOps and AI Ethics</h3>
+                        <p><strong>MLOps</strong> combines ML, DevOps, and Data Engineering to streamline the entire machine learning lifecycle, from development to deployment and monitoring in a production environment.</p>
+                        <p>It's also crucial to consider ethical implications like **Algorithmic Bias** and **Data Privacy** when developing AI systems.</p>
+                        <h3 class="text-2xl font-bold mt-6 mb-2">Capstone Project</h3>
+                        <p>The **Capstone Project** is the final, hands-on component where you apply the knowledge and skills from all six modules to a single, comprehensive problem.</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Section -->
+                <div id="workbooks" class="module-slide">
+                    <h2 class="text-3xl font-bold mb-4">Interactive Learning</h2>
+                    
+                    <!-- Workbook Solutions -->
+                    <div class="p-6 bg-matrix-green rounded-lg mb-6 border border-neon-green">
+                        <h3 class="text-xl font-bold text-neon-green mb-4">Workbook Solutions</h3>
+                        <div class="prose text-neon-green max-w-none" id="workbook-solutions"></div>
+                    </div>
+
+                    <!-- Capstone Project Overview -->
+                    <div class="p-6 bg-matrix-green rounded-lg mb-6 border border-neon-green">
+                        <h3 class="text-xl font-bold text-neon-green mb-4">Capstone Project: Financial News Sentiment Dashboard</h3>
+                        <div class="prose text-neon-green max-w-none">
+                            <p>For your capstone project, you will build an end-to-end Financial News Sentiment Dashboard. This project will test your skills across all modules and result in a portfolio-ready application.</p>
+                            <p><strong>Project Steps:</strong></p>
+                            <ol>
+                                <li><strong>Data Acquisition:</strong> You will use a public API (e.g., from a free news source) to pull financial news headlines.</li>
+                                <li><strong>Data Preprocessing (Module 4):</strong> You will clean and preprocess the raw text data, removing stop words and tokenizing sentences.</li>
+                                <li><strong>Model Training (Module 3):</strong> You will train a simple deep learning model to classify headlines as positive, negative, or neutral sentiment.</li>
+                                <li><strong>Data Visualization & Deployment:</strong> You will use a simple Python library (like Streamlit) to create a dashboard that displays the sentiment of the headlines.</li>
+                            </ol>
+                            <p>This project will teach you the entire lifecycle of an AI application, from data to deployment.</p>
+                        </div>
+                    </div>
+
+                    <!-- Module Quizzes -->
+                    <div class="p-6 bg-matrix-green rounded-lg mb-6 border border-neon-green">
+                        <h3 class="text-xl font-bold text-neon-green mb-4">Quizzes</h3>
+                        <div class="quiz-container mb-4">
+                            <h4 class="font-semibold text-neon-green mb-2">Module 1 Quiz</h4>
+                            <div id="quiz1-questions"></div>
+                            <div id="quiz1-results" class="hidden mt-4 p-4 rounded-lg bg-matrix-green text-neon-green"></div>
+                            <button onclick="runQuiz(1)" class="mt-4 w-full slide-button">Submit</button>
+                        </div>
+                        <div class="quiz-container mb-4">
+                            <h4 class="font-semibold text-neon-green mb-2">Module 2 Quiz</h4>
+                            <div id="quiz2-questions"></div>
+                            <div id="quiz2-results" class="hidden mt-4 p-4 rounded-lg bg-matrix-green text-neon-green"></div>
+                            <button onclick="runQuiz(2)" class="mt-4 w-full slide-button">Submit</button>
+                        </div>
+                        <div class="quiz-container mb-4">
+                            <h4 class="font-semibold text-neon-green mb-2">Module 3 Quiz</h4>
+                            <div id="quiz3-questions"></div>
+                            <div id="quiz3-results" class="hidden mt-4 p-4 rounded-lg bg-matrix-green text-neon-green"></div>
+                            <button onclick="runQuiz(3)" class="mt-4 w-full slide-button">Submit</button>
+                        </div>
+                        <div class="quiz-container mb-4">
+                            <h4 class="font-semibold text-neon-green mb-2">Module 4 Quiz</h4>
+                            <div id="quiz4-questions"></div>
+                            <div id="quiz4-results" class="hidden mt-4 p-4 rounded-lg bg-matrix-green text-neon-green"></div>
+                            <button onclick="runQuiz(4)" class="mt-4 w-full slide-button">Submit</button>
+                        </div>
+                    </div>
+
+                    <!-- Notebooks -->
+                    <div class="p-6 bg-matrix-green rounded-lg border border-neon-green">
+                        <h3 class="text-xl font-bold text-neon-green mb-4">Interactive Notebooks</h3>
+                        <p class="mb-4">These notebook snippets are designed for a Jupyter environment. Copy and paste the code into a Jupyter Notebook cell to run it.</p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-gray-800 p-4 rounded-lg">
+                                <h4 class="font-bold">Module 1: Setup Notebook</h4>
+                                <div id="notebook1-content"></div>
+                            </div>
+                            <div class="bg-gray-800 p-4 rounded-lg">
+                                <h4 class="font-bold">Module 2: Data Prep & EDA Notebook</h4>
+                                <div id="notebook2-content"></div>
+                            </div>
+                            <div class="bg-gray-800 p-4 rounded-lg">
+                                <h4 class="font-bold">Module 3: Neural Networks Notebook</h4>
+                                <div id="notebook3-content"></div>
+                            </div>
+                            <div class="bg-gray-800 p-4 rounded-lg">
+                                <h4 class="font-bold">Module 4: NLP Basics Notebook</h4>
+                                <div id="notebook4-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const progressBar = document.getElementById('progressBar');
+        const navItems = document.querySelectorAll('.nav-item');
+        const moduleSlides = document.querySelectorAll('.module-slide');
+        const menuButton = document.getElementById('menu-button');
+        const navMenu = document.getElementById('nav-menu');
+        
+        let modules = ['module1', 'module2', 'module3', 'module4', 'module5', 'module6', 'workbooks'];
+        
+        // Handle menu toggle
+        menuButton.addEventListener('click', () => {
+            navMenu.classList.toggle('hidden');
+        });
+
+        // Hide menu if clicked outside
+        document.addEventListener('click', (event) => {
+            if (!navMenu.contains(event.target) && !menuButton.contains(event.target)) {
+                navMenu.classList.add('hidden');
+            }
+        });
+
+        const updateProgress = (targetId) => {
+            const index = modules.indexOf(targetId);
+            if (index !== -1) {
+                const progress = (index + 1) / modules.length;
+                progressBar.style.width = `${progress * 100}%`;
+            }
+        };
+
+        const setActiveModule = (targetId) => {
+            moduleSlides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            document.getElementById(targetId).classList.add('active');
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if(item.getAttribute('data-target') === targetId) {
+                    item.classList.add('active');
+                }
+            });
+            updateProgress(targetId);
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = e.target.getAttribute('data-target');
+                setActiveModule(targetId);
+                navMenu.classList.add('hidden');
+            });
+        });
+
+        // Initial setup
+        setActiveModule('module1');
+
+        const quizzes = {
+            1: {
+                questions: [
+                    { question: "Which of the following is the broadest concept?", options: ["Deep Learning", "Artificial Intelligence (AI)", "Machine Learning (ML)", "Robotics"], correct: 1, explanation: "Artificial Intelligence is the overarching field, with Machine Learning as a subset and Deep Learning as a subset of ML." },
+                    { question: "What is the primary goal of Supervised Learning?", options: ["To find hidden patterns in unlabeled data", "To learn from labeled data to make predictions on new data", "To learn by interacting with an environment through rewards and penalties", "To create new features from existing data"], correct: 1, explanation: "Supervised learning models are trained on labeled datasets, where each data point is tagged with a correct output." },
+                    { question: "An algorithm that groups customers into segments based on their purchasing habits without any prior labels is an example of:", options: ["Supervised Learning", "Reinforcement Learning", "Unsupervised Learning", "Deep Learning"], correct: 2, explanation: "Unsupervised learning is used to find hidden patterns or structures within unlabeled data." },
+                    { question: "What is the primary purpose of the NumPy library in an AI/ML environment?", options: ["To create interactive visualizations", "To manage software packages and environments", "To perform efficient numerical computations with multi-dimensional arrays", "To build and train deep neural networks"], correct: 2, explanation: "NumPy is a fundamental package for numerical computation in Python and provides support for large, multi-dimensional arrays and matrices." },
+                    { question: "Which term is best described as 'training a machine to play a game by rewarding it for winning and penalizing it for losing'?", options: ["Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Transfer Learning"], correct: 2, explanation: "Reinforcement learning models learn by interacting with an environment and receiving rewards or penalties." }
+                ]
+            },
+            2: {
+                questions: [
+                    { question: "From Module 1: What is the relationship between AI, ML, and DL?", options: ["AI and ML are the same, with DL being a subset.", "ML is a subset of AI, and DL is a subset of ML.", "DL is a subset of AI, and ML is a subset of DL.", "They are three unrelated fields."], correct: 1, explanation: "AI is the broadest concept, followed by ML, and then DL as a more specialized subset of ML." },
+                    { question: "What is the primary purpose of data preprocessing in machine learning?", options: ["To make the data look visually appealing in charts", "To prepare and transform raw data into a suitable format for ML algorithms", "To reduce the amount of data to save storage space", "To encrypt sensitive information in the dataset"], correct: 1, explanation: "Data preprocessing transforms raw data into a clean, structured format that ML algorithms can effectively use, improving model performance and reliability." },
+                    { question: "Which metric is most appropriate for evaluating a regression model?", options: ["Accuracy", "Precision", "Mean Squared Error (MSE)", "F1 Score"], correct: 2, explanation: "Mean Squared Error (MSE) measures the average squared difference between predicted and actual values, making it suitable for regression tasks where we predict continuous values." },
+                    { question: "What does the term 'feature engineering' refer to?", options: ["The process of selecting which machine learning algorithm to use", "Creating new features from existing data to improve model performance", "Engineering a system to automatically collect more data", "The process of tuning model hyperparameters"], correct: 1, explanation: "Feature engineering involves creating new features from existing data to help the model better understand patterns, which can significantly improve model performance." },
+                    { question: "What is the difference between overfitting and underfitting?", options: ["Overfitting is when the model is too simple, underfitting is when it is too complex.", "Overfitting occurs on test data, while underfitting occurs on training data.", "Overfitting is when the model learns noise in the data, underfitting is when it fails to capture the underlying pattern.", "There is no difference; they are different terms for the same concept."], correct: 2, explanation: "Overfitting results in a model that performs well on training data but poorly on unseen data. Underfitting is when the model is too simple and performs poorly on both." }
+                ]
+            },
+            3: {
+                questions: [
+                    { question: "From Module 2: A confusion matrix is used to evaluate the performance of which type of model?", options: ["Regression", "Clustering", "Classification", "Anomaly Detection"], correct: 2, explanation: "A confusion matrix shows the number of true positives, false positives, true negatives, and false negatives for a classification model." },
+                    { question: "What is the primary purpose of a neural network's activation function?", options: ["To add non-linearity to the network's output", "To speed up the training process", "To increase the number of layers", "To handle missing data"], correct: 0, explanation: "Activation functions introduce non-linearity, allowing the network to learn more complex, non-linear patterns in the data." },
+                    { question: "Which algorithm is used in deep learning to efficiently update a neural network's weights during training?", options: ["K-Means", "Logistic Regression", "Backpropagation", "Decision Trees"], correct: 2, explanation: "Backpropagation is the key algorithm that calculates and propagates the error gradients backward through the network to update the weights." },
+                    { question: "In a CNN, what is the main purpose of a 'convolutional layer'?", options: ["To reduce the spatial dimensions of the feature maps", "To flatten the input data into a single vector", "To extract features like edges and textures from the input image", "To apply a non-linear activation function to the data"], correct: 2, explanation: "Convolutional layers apply filters to the image to automatically learn and extract hierarchical features." },
+                    { question: "What is a major benefit of using transfer learning?", options: ["It requires a larger dataset to achieve good performance.", "It makes the model less complex and easier to interpret.", "It significantly reduces training time and can lead to better performance with limited data.", "It is only used for unsupervised learning tasks."], correct: 2, explanation: "Transfer learning leverages a pre-trained model on a large dataset, allowing you to fine-tune it for a related task with much less data and computational resources." }
+                ]
+            },
+            4: {
+                questions: [
+                    { question: "From Module 3: What is the main purpose of a 'hidden layer' in a neural network?", options: ["To receive the raw input data", "To perform complex computations and transformations on the data", "To produce the final prediction", "To manage the network's overall structure"], correct: 1, explanation: "Hidden layers are where the primary computations happen, allowing the network to learn intricate patterns from the data." },
+                    { question: "What is the main difference between stemming and lemmatization?", options: ["Stemming is a more accurate process that considers context.", "Lemmatization is faster but less accurate.", "Stemming is a crude process that often chops off the end of words, while lemmatization reduces words to their meaningful base form.", "They are two different names for the exact same process."], correct: 2, explanation: "Lemmatization is a more sophisticated process that uses a dictionary to find the root form, whereas stemming is a heuristic that may result in non-words." },
+                    { question: "What is a 'word embedding'?", options: ["A method to count word frequencies", "A binary representation of a word", "A numerical vector that captures a word's meaning and relationships", "A list of stop words"], correct: 2, explanation: "Word embeddings allow machine learning models to understand the semantic relationships between words by representing them as dense vectors in a high-dimensional space." },
+                    { question: "Which NLP task involves assigning a sentiment (e.g., positive, negative, neutral) to a piece of text?", options: ["Text Classification", "Machine Translation", "Sentiment Analysis", "Named Entity Recognition"], correct: 2, explanation: "Sentiment analysis is a specific type of text classification where the goal is to determine the emotional tone of the text." },
+                    { question: "What is a key feature of the Transformer architecture?", options: ["It uses a single, massive recurrent layer.", "It relies on a self-attention mechanism to weigh the importance of different words.", "It is designed only for text generation tasks.", "It is the predecessor to simple RNNs."], correct: 1, explanation: "The self-attention mechanism is what makes the Transformer so effective at understanding context and relationships in long sequences of text." }
+                ]
+            }
+        };
+
+        const renderQuiz = (quizNumber) => {
+            const quizData = quizzes[quizNumber];
+            const quizContainer = document.getElementById(`quiz${quizNumber}-questions`);
+            if (!quizContainer) return;
+
+            quizContainer.innerHTML = '';
+            quizData.questions.forEach((q, index) => {
+                const questionHtml = `
+                    <div class="mb-4 p-4 rounded-lg bg-matrix-green border border-neon-green">
+                        <p class="font-bold mb-2 text-neon-green">${index + 1}. ${q.question}</p>
+                        <div class="space-y-2">
+                            ${q.options.map((option, optIndex) => `
+                                <label class="block">
+                                    <input type="radio" name="q${quizNumber}-${index}" value="${optIndex}" class="hidden peer">
+                                    <div class="quiz-option p-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors peer-checked:bg-blue-600">
+                                        ${option}
+                                    </div>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <div id="q${quizNumber}-${index}-feedback" class="feedback-message mt-2 text-sm hidden"></div>
+                    </div>
+                `;
+                quizContainer.innerHTML += questionHtml;
+            });
+        };
+
+        const runQuiz = (quizNumber) => {
+            const quizData = quizzes[quizNumber];
+            const totalQuestions = quizData.questions.length;
+            let score = 0;
+            let allAnswered = true;
+
+            quizData.questions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="q${quizNumber}-${index}"]:checked`);
+                const feedbackDiv = document.getElementById(`q${quizNumber}-${index}-feedback`);
+                const optionsDivs = document.querySelectorAll(`input[name="q${quizNumber}-${index}"] ~ div`);
+
+                if (!selectedOption) {
+                    allAnswered = false;
+                    return;
+                }
+                
+                const selectedIndex = parseInt(selectedOption.value);
+                const isCorrect = selectedIndex === q.correct;
+                
+                optionsDivs.forEach(div => {
+                    div.classList.remove('bg-red-600', 'bg-green-600', 'bg-matrix-green', 'hover:bg-gray-600');
+                    div.classList.add('bg-gray-800');
+                });
+                feedbackDiv.classList.add('hidden');
+
+                if (isCorrect) {
+                    score++;
+                    selectedOption.nextElementSibling.classList.add('bg-green-600');
+                    selectedOption.nextElementSibling.classList.remove('bg-gray-800', 'hover:bg-gray-600');
+                } else {
+                    selectedOption.nextElementSibling.classList.add('bg-red-600');
+                    selectedOption.nextElementSibling.classList.remove('bg-gray-800', 'hover:bg-gray-600');
+                    
+                    const correctOptionDiv = document.querySelector(`input[name="q${quizNumber}-${index}"][value="${q.correct}"]`).nextElementSibling;
+                    correctOptionDiv.classList.add('bg-green-600');
+                    correctOptionDiv.classList.remove('bg-gray-800', 'hover:bg-gray-600');
+                }
+
+                feedbackDiv.innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
+                feedbackDiv.classList.remove('hidden');
+            });
+
+            if (!allAnswered) {
+                alert("Please answer all questions before submitting.");
+                return;
+            }
+
+            const resultsDiv = document.getElementById(`quiz${quizNumber}-results`);
+            const percentage = (score / totalQuestions) * 100;
+            let message = '';
+            if (percentage >= 80) {
+                message = "🎉 Excellent! You have a strong understanding of the concepts.";
+            } else if (percentage >= 60) {
+                message = "👍 Good job! You might want to review a few concepts.";
+            } else {
+                message = "📚 Keep studying! Review the module content and try again.";
+            }
+
+            resultsDiv.innerHTML = `
+                <p class="text-lg font-bold">Quiz Completed!</p>
+                <p>Your Score: ${score}/${totalQuestions} (${percentage.toFixed(1)}%)</p>
+                <p>${message}</p>
+            `;
+            resultsDiv.classList.remove('hidden');
+        };
+        
+        window.onload = () => {
+            renderQuiz(1);
+            renderQuiz(2);
+            renderQuiz(3);
+            renderQuiz(4);
+            
+            const workbookSolutionsContent = `
+                <h3 class="text-2xl font-bold mt-6 mb-2">Workbook Solutions</h3>
+                <h4 class="text-xl font-bold mt-4 mb-2">Chapter 1: AI Foundations - Fill in the Blanks</h4>
+                <p><strong>1.1 Complete the Definitions:</strong> computer, human. learn, data. Supervised, Unsupervised, Reinforcement.</p>
+                <p><strong>1.2 Finish the Sentence:</strong> uses artificial neural networks with multiple (deep) layers. it allows you to write and execute code, visualize data, and write narrative text in a single, interactive document. support for large, multi-dimensional arrays and matrices, which are fundamental for numerical computation.</p>
+                <p><strong>1.3 Real-World Applications Matching:</strong> Email spam detection → Supervised Learning (Classification). Netflix movie recommendations → Unsupervised Learning. Self-driving car navigation → Reinforcement Learning. Customer segmentation → Unsupervised Learning. Medical image diagnosis → Deep Learning.</p>
+                
+                <h4 class="text-xl font-bold mt-4 mb-2">Chapter 2: Data Preprocessing</h4>
+                <p><strong>2.1 Data Cleaning Checklist:</strong> Imputation, Removing punctuation/stop words/lower-casing, Normalization or Standardization, One-Hot Encoding, Removing or transforming outliers.</p>
+                <p><strong>2.2 EDA Insights Discovery:</strong> Answers will vary. Focus on identifying patterns, surprising features, and potential problems in the data.</p>
+                
+                <h4 class="text-xl font-bold mt-4 mb-2">Chapter 3: Model Building</h4>
+                <p><strong>3.1 Algorithm Selection:</strong> Linear Regression for house prices (continuous output). Clustering for customers (unlabeled data). Logistic Regression or Decision Tree for emails (binary output).</p>
+                <p><strong>3.2 Evaluation Metrics:</strong> Medical diagnosis: Recall. Predicting stock prices: RMSE or MAE. Recommending products: Accuracy or F1-Score. Fraud detection: Precision.</p>
+
+                <h4 class="text-xl font-bold mt-4 mb-2">Chapter 4: Deep Learning Concepts</h4>
+                <p><strong>4.1 Neural Network Architecture Design:</strong> Input layer: 784 neurons. Hidden layers: ReLU. Output layer: 10 neurons with Softmax activation.</p>
+                <p><strong>4.2 Activation Function Matching:</strong> Hidden layers: ReLU. Binary classification: Sigmoid. Multi-class classification: Softmax. Outputs between -1 and 1: Tanh.</p>
+
+                <h4 class="text-xl font-bold mt-4 mb-2">Chapter 5: Project Planning</h4>
+                <p><strong>5.1 My AI Project Proposal:</strong> This is an example. Focus on a clear problem, the type of ML problem, data requirements, success metrics, and a timeline.</p>
+                
+                <h4 class="text-xl font-bold mt-4 mb-2">Reflection Questions</h4>
+                <p>Answers will be personal!</p>
+            `;
+            document.getElementById('workbook-solutions').innerHTML = workbookSolutionsContent;
+
+            // Notebooks content
+            const notebook1Content = `
+                <div class="jupyter-markdown">
+                    <h3 class="text-xl font-bold">AI/ML Environment Setup and Foundational Libraries</h3>
+                    <p>This notebook will guide you through setting up your environment and introduce you to the fundamental Python libraries: NumPy and Pandas.</p>
+                    <h4 class="font-bold mt-4">Part 1: Setting up Your Environment</h4>
+                    <p>Follow the instructions to install Anaconda and launch a Jupyter Notebook.</p>
+                    <h4 class="font-bold mt-4">Part 2: Working with NumPy</h4>
+                    <p>NumPy is the cornerstone of scientific computing in Python. Let's create and inspect arrays.</p>
+                </div>
+                <pre class="jupyter-code"><code>import numpy as np
+
+# Create a 2x3 matrix
+matrix_data = [[1, 2, 3],
+               [4, 5, 6]]
+
+# Your code here:
+np_array = np.array(matrix_data)
+print("Shape of the array:", np_array.shape)
+</code></pre>
+                <pre class="jupyter-code"><code># Perform basic array operations
+array_a = np.array([10, 20, 30])
+array_b = np.array([1, 2, 3])
+sum_array = array_a + array_b
+print("Sum of arrays:", sum_array)
+</code></pre>
+                <div class="jupyter-markdown">
+                    <h4 class="font-bold mt-4">Part 3: Working with Pandas</h4>
+                    <p>Pandas is a powerful library for data manipulation and analysis. Its primary data structure is the <code>DataFrame</code>.</p>
+                </div>
+                <pre class="jupyter-code"><code>import pandas as pd
+
+# Create a DataFrame
+data = {
+    'Name': ['Alice', 'Bob', 'Charlie'],
+    'Age': [25, 30, 35]
+}
+df = pd.DataFrame(data)
+
+# Add a new 'Salary' column and calculate its mean
+df['Salary'] = [70000, 85000, 95000]
+average_salary = df['Salary'].mean()
+print("Average Salary:", average_salary)
+</code></pre>
+            `;
+            document.getElementById('notebook1-content').innerHTML = notebook1Content;
+            
+            const notebook2Content = `
+                <div class="jupyter-markdown">
+                    <h3 class="text-xl font-bold">Data Preprocessing and EDA</h3>
+                    <p>This notebook provides a hands-on guide to a crucial step in any machine learning project: data preprocessing and exploratory data analysis (EDA).</p>
+                    <h4 class="font-bold mt-4">Part 1: The Messy Dataset</h4>
+                    <p>We'll use a sample dataset with missing values and categorical data to simulate a real-world scenario.</p>
+                </div>
+                <pre class="jupyter-code"><code>import pandas as pd
+import numpy as np
+
+data = {
+    'satisfaction_score': [4, 5, 2, np.nan, 5],
+    'product_type': ['A', 'B', 'A', 'C', 'B']
+}
+df = pd.DataFrame(data)
+print("Original DataFrame:")
+print(df)
+</code></pre>
+                <div class="jupyter-markdown">
+                    <h4 class="font-bold mt-4">Part 2: Data Preprocessing</h4>
+                    <p>We need to fix the issues in our dataset.</p>
+                </div>
+                <pre class="jupyter-code"><code># Handling missing values
+median_score = df['satisfaction_score'].median()
+df['satisfaction_score'].fillna(median_score, inplace=True)
+print("\\nDataFrame after handling missing values:")
+print(df)
+</code></pre>
+                <pre class="jupyter-code"><code># Encoding Categorical Variables
+df = pd.get_dummies(df, columns=['product_type'], prefix='product')
+print("\\nDataFrame after One-Hot Encoding:")
+print(df)
+</code></pre>
+            `;
+            document.getElementById('notebook2-content').innerHTML = notebook2Content;
+            
+            const notebook3Content = `
+                <div class="jupyter-markdown">
+                    <h3 class="text-xl font-bold">Building a Simple Neural Network with Keras</h3>
+                    <p>This notebook will walk you through the process of building, compiling, and training your first neural network using the high-level Keras API on top of TensorFlow.</p>
+                    <h4 class="font-bold mt-4">Part 1: Setup and Data</h4>
+                    <p>First, we need to import the necessary libraries and create some sample data. We will generate a dataset that is not linearly separable.</p>
+                </div>
+                <pre class="jupyter-code"><code>import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import make_moons
+
+X, y = make_moons(n_samples=1000, noise=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print("Data split complete.")
+</code></pre>
+                <div class="jupyter-markdown">
+                    <h4 class="font-bold mt-4">Part 2: Building the Neural Network</h4>
+                    <p>Now, let's build a simple neural network using Keras's <code>Sequential</code> model. We will add layers one by one.</p>
+                </div>
+                <pre class="jupyter-code"><code>model = Sequential()
+model.add(Dense(16, input_shape=(2,), activation='relu'))
+model.add(Dense(8, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+model.summary()
+</code></pre>
+                <div class="jupyter-markdown">
+                    <h4 class="font-bold mt-4">Part 3: Compiling and Training the Model</h4>
+                    <p>We need to compile the model by specifying the optimizer, loss function, and metrics before training it.</p>
+                </div>
+                <pre class="jupyter-code"><code>model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+print("Model compiled.")
+
+history = model.fit(X_train, y_train, epochs=5, batch_size=32, verbose=1)
+print("\\nModel trained.")
+</code></pre>
+            `;
+            document.getElementById('notebook3-content').innerHTML = notebook3Content;
+            
+            const notebook4Content = `
+                <div class="jupyter-markdown">
+                    <h3 class="text-xl font-bold">Basic NLP with NLTK</h3>
+                    <p>This notebook provides a hands-on introduction to Natural Language Processing (NLP) using the NLTK library. We'll go through the essential text preprocessing steps.</p>
+                    <h4 class="font-bold mt-4">Part 1: Setup and Sample Text</h4>
+                </div>
+                <pre class="jupyter-code"><code>import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+
+sample_text = "Natural Language Processing (NLP) is a fascinating field."
+print("Sample text loaded.")
+</code></pre>
+                <div class="jupyter-markdown">
+                    <h4 class="font-bold mt-4">Part 2: Text Preprocessing</h4>
+                </div>
+                <pre class="jupyter-code"><code># Tokenization and Lowercasing
+text_lower = sample_text.lower()
+tokens = word_tokenize(text_lower)
+print(f"Tokens: {tokens}")
+</code></pre>
+                <pre class="jupyter-code"><code># Removing Stop Words
+stop_words = set(stopwords.words('english'))
+filtered_tokens = [word for word in tokens if word.isalpha() and word not in stop_words]
+print(f"Filtered tokens: {filtered_tokens}")
+</code></pre>
+                <pre class="jupyter-code"><code># Stemming
+stemmer = PorterStemmer()
+words_to_process = ["running", "runs", "ran"]
+stemmed_words = [stemmer.stem(word) for word in words_to_process]
+print(f"Original: {words_to_process}")
+print(f"Stemmed: {stemmed_words}")
+</code></pre>
+            `;
+            document.getElementById('notebook4-content').innerHTML = notebook4Content;
+        };
+    </script>
+</body>
+</html>
