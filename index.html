@@ -1,35 +1,433 @@
-/* Module Title */
-.module-content h2 {
-    font-size: 2.5rem; /* Large */
-    font-weight: 900; /* Extra bold */
-    text-transform: uppercase;
-    margin-bottom: 2rem; /* Double space to first section */
-    color: #00ff41;
-    text-shadow: 0 0 8px #00ff41;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Machine Learning Mastery Course</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0d1117;
+            color: #00ff41;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .text-neon-green { color: #00ff41; }
+        .bg-matrix-green { background-color: #004d00; }
+        .border-neon-green { border-color: #00ff41; }
+        .bg-terminal-code { background-color: #001a00; }
 
-/* Section Titles */
-.module-content h3 {
-    font-size: 1.75rem; /* Bigger than body */
-    font-weight: 600;
-    margin-top: 2rem; /* Double space before each new section */
-    margin-bottom: 1rem; /* Single space to its content */
-    color: #00ff41;
-}
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background-color: #00ff41;
+            box-shadow: 0 0 10px #00ff41, 0 0 5px #00ff41;
+            transition: width 0.5s ease-in-out;
+            z-index: 50;
+        }
 
-/* Subsection Titles (italicized) */
-.module-content h4 {
-    font-size: 1.25rem;
-    font-style: italic;
-    font-weight: 500;
-    margin-top: 1rem; /* Single space before subsections */
-    margin-bottom: 0.5rem; /* Tight space to body text */
-    color: #00ff41;
-}
+        .quiz-option {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            line-height: 1.5; /* Added for better readability */
+        }
+        .quiz-option:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 5px #00ff41;
+        }
+        .explanation {
+            font-size: 0.875rem;
+            color: #00e63c;
+        }
+        .correct-answer {
+            background-color: #008000 !important; /* !important to override other styles */
+        }
+        .incorrect-answer {
+            background-color: #b30000 !important; /* !important to override other styles */
+        }
+        pre {
+            border: 1px solid #00ff41;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+            font-size: 0.875rem;
+            line-height: 1.4; /* Added for better code readability */
+        }
+        .course-title {
+            font-size: 3rem; /* Larger title */
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem; /* More space below title */
+            color: #00ff41;
+            text-shadow: 0 0 15px #00ff41, 0 0 7px #00ff41;
+            line-height: 1.2;
+        }
+        .module-content h2 {
+            font-size: 2.5rem; /* Slightly larger module titles */
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 3rem; /* More space above module titles */
+            margin-bottom: 1.5rem; /* More space below module titles */
+            padding-bottom: 0.5rem; /* Underline effect space */
+            border-bottom: 2px solid #00ff41; /* Underline effect */
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        .module-content h3 {
+            font-size: 1.75rem; /* Slightly larger section titles */
+            font-style: italic;
+            font-weight: 700;
+            margin-top: 2.5rem; /* More space above section titles */
+            margin-bottom: 1rem; /* More space below section titles */
+            color: #00e63c; /* Slightly darker green for subsections */
+            text-shadow: 0 0 5px #00e63c;
+        }
+        .module-content h4 {
+            font-size: 1.25rem; /* For hands-on/quiz titles */
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #00e63c;
+        }
+        .module-content p {
+            margin-bottom: 1.25rem; /* Increased paragraph spacing */
+            line-height: 1.7; /* Improved line height for readability */
+        }
+        .jupyter-markdown, .jupyter-code {
+            margin-top: 1.5rem; /* More space above these blocks */
+            margin-bottom: 1.5rem; /* More space below these blocks */
+        }
+        .quiz-container {
+            border: 1px solid #00ff41;
+            margin-top: 3.5rem; /* More space above quiz container */
+            padding: 1.5rem; /* Increased padding */
+            border-radius: 0.75rem; /* Slightly more rounded corners */
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+        .action-button {
+            background-color: #004d00;
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            padding: 0.75rem 1.5rem; /* Larger buttons */
+            border-radius: 0.375rem; /* Slightly more rounded */
+            transition: all 0.2s;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .action-button:hover {
+            box-shadow: 0 0 15px #00ff41; /* Enhanced hover effect */
+            background-color: #006600;
+        }
+        .module-view {
+            display: none;
+            padding: 2rem 0; /* Adjusted padding, removed left/right from here */
+            overflow-y: auto;
+            max-height: calc(100vh - 4rem);
+        }
+        .module-view.active {
+            display: block;
+        }
+        .next-button-locked {
+            pointer-events: none;
+            opacity: 0.4; /* Slightly more opaque for locked state */
+            box-shadow: none;
+            cursor: not-allowed;
+        }
 
-/* Paragraph body */
-.module-content p {
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 1rem; /* Normal spacing between paragraphs */
+        /* Hiding scrollbar */
+        .module-view::-webkit-scrollbar {
+            display: none;
+            width: 0 !important;
+        }
+        .module-view {
+            scrollbar-width: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mx-auto p-8 bg-matrix-green rounded-lg shadow-md border border-neon-green">
+        <div class="progress-bar" id="progressBar"></div>
+
+        <header class="course-title">
+            AI & Machine Learning Mastery Course
+        </header>
+
+        <div id="course-content-container" class="space-y-16"> <!-- Increased space between modules -->
+            <!-- Module 1 Content -->
+            <section id="module1" class="module-view active module-content">
+                <h2>MODULE 1: AI/ML FOUNDATIONS</h2>
+                <div class="prose text-neon-green max-w-none">
+                    <h3>What is AI?</h3>
+                    <p>Artificial Intelligence (AI) is a broad field of computer science that gives machines the ability to perform tasks that typically require human intelligence. It is a collection of techniques and algorithms that allow machines to mimic and even surpass human cognitive functions.</p>
+
+                    <h3>Machine Learning (ML)</h3>
+                    <p><strong>Machine Learning (ML)</strong> is a subset of AI that focuses on building systems that can learn from and make decisions based on data. Instead of being explicitly programmed with rules, an ML model is trained on a large dataset to identify patterns and relationships. This allows it to make predictions or decisions about new, unseen data.</p>
+
+                    <h3>Types of Learning</h3>
+                    <p><strong>Supervised Learning:</strong> The model is trained on a labeled dataset. Example: Training a model to identify spam emails.</p>
+                    <p><strong>Unsupervised Learning:</strong> The model is trained on an unlabeled dataset to find hidden patterns or structures. Example: Grouping customers into different segments based on purchasing behavior.</p>
+                    <p><strong>Reinforcement Learning:</strong> The model learns by interacting with an environment and receiving rewards or penalties. Example: Training a self-driving car.</p>
+                    <p>Think of it as a set of nested concepts: AI is the largest, ML is inside AI, and Deep Learning (DL) is inside ML.</p>
+
+                    <h4>Hands-on: Environment Setup</h4>
+                    <p>Before moving on, let's make sure your environment is ready. Copy and paste this code into a Jupyter Notebook to practice with NumPy and Pandas.</p>
+                    <div class="bg-terminal-code p-4 rounded-lg border border-neon-green shadow-lg">
+                        <h4 class="font-bold mb-3 text-neon-green">Module 1: Setup Notebook</h4>
+                        <pre class="jupyter-code"><code>import numpy as np
+import pandas as pd
+
+# Create and inspect a 2x3 matrix
+matrix_data = [[1, 2, 3], [4, 5, 6]]
+np_array = np.array(matrix_data)
+print("Shape of the array:", np_array.shape)
+
+# Create a simple Pandas DataFrame
+data = {'Name': ['Neo', 'Trinity', 'Morpheus'], 'Power Level': [100, 95, 80]}
+df = pd.DataFrame(data)
+print("\nDataFrame:")
+print(df)
+</code></pre>
+                    </div>
+
+                    <h4>Knowledge Check: Module 1 Quiz</h4>
+                    <div class="quiz-container mb-4">
+                        <h4 class="font-semibold text-neon-green mb-3">Quiz 1: AI/ML Foundations</h4>
+                        <div id="quiz1-questions"></div>
+                        <div id="quiz1-results" class="hidden mt-6 p-4 rounded-lg bg-terminal-code text-neon-green shadow-inner"></div>
+                        <button onclick="runQuiz(1)" class="mt-6 w-full action-button">Submit Quiz</button>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-10">
+                    <button id="next1" onclick="nextModule()" class="action-button next-button-locked">Next Module</button>
+                </div>
+            </section>
+
+            <!-- Module 2 Content -->
+            <section id="module2" class="module-view module-content">
+                <h2>MODULE 2: CORE MACHINE LEARNING</h2>
+                <div class="prose text-neon-green max-w-none">
+                    <h3>Data Preprocessing</h3>
+                    <p>This module dives into the essential steps of preparing your data. <strong>Data Preprocessing</strong> is a crucial step that involves cleaning, organizing, and transforming raw data into a suitable format for ML algorithms.</p>
+                    <p>Key steps include: Handling Missing Values, Data Transformation (Scaling/Encoding), and Feature Engineering.</p>
+                    <div class="bg-terminal-code p-4 rounded-lg border border-neon-green shadow-lg">
+                        <h4 class="font-bold mb-3 text-neon-green">Hands-on: Data Cleaning</h4>
+                        <pre class="jupyter-code"><code>import pandas as pd
+import numpy as np
+
+# Sample messy dataset
+data = {
+    'satisfaction_score': [4, 5, 2, np.nan, 5],
+    'product_type': ['A', 'B', 'A', 'C', 'B']
 }
+df = pd.DataFrame(data)
+
+# Fill missing values with the median
+median_score = df['satisfaction_score'].median()
+df['satisfaction_score'].fillna(median_score, inplace=True)
+
+# One-hot encode the categorical column
+df = pd.get_dummies(df, columns=['product_type'], prefix='product')
+print(df)
+</code></pre>
+                    </div>
+                    <h3>Supervised Learning: Regression & Classification</h3>
+                    <p><strong>Regression</strong> is used for predicting a continuous output value (e.g., house prices). <strong>Classification</strong> is used for predicting a categorical output (e.g., spam/not spam).</p>
+                    <h4>Knowledge Check: Module 2 Quiz</h4>
+                    <div class="quiz-container mb-4">
+                        <h4 class="font-semibold text-neon-green mb-3">Quiz 2: Core ML Concepts</h4>
+                        <div id="quiz2-questions"></div>
+                        <div id="quiz2-results" class="hidden mt-6 p-4 rounded-lg bg-terminal-code text-neon-green shadow-inner"></div>
+                        <button onclick="runQuiz(2)" class="mt-6 w-full action-button">Submit Quiz</button>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-10">
+                    <button onclick="previousModule()" class="action-button">Previous Module</button>
+                    <button id="next2" onclick="nextModule()" class="action-button next-button-locked">Next Module</button>
+                </div>
+            </section>
+
+            <!-- Module 3 Content -->
+            <section id="module3" class="module-view module-content">
+                <h2>MODULE 3: DEEP LEARNING</h2>
+                <div class="prose text-neon-green max-w-none">
+                    <h3>Introduction to Neural Networks</h3>
+                    <p>Deep Learning is a powerful subset of Machine Learning that uses artificial neural networks with multiple layers to learn complex patterns. A neural network consists of layers of neurons, with non-linear <strong>activation functions</strong> like <strong>ReLU</strong> and <strong>Softmax</strong> applied to their outputs.</p>
+                    <h4>Hands-on: Building a Simple Neural Network</h4>
+                    <p>Let's build a simple neural network using Keras on top of TensorFlow to see how it works in practice.</p>
+                    <div class="bg-terminal-code p-4 rounded-lg border border-neon-green shadow-lg">
+                        <h4 class="font-bold mb-3 text-neon-green">Module 3: Neural Networks Notebook</h4>
+                        <pre class="jupyter-code"><code>import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from sklearn.datasets import make_moons
+from sklearn.model_selection import train_test_split
+
+X, y = make_moons(n_samples=1000, noise=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = Sequential()
+model.add(Dense(16, input_shape=(2,), activation='relu'))
+model.add(Dense(8, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+print("Model built and compiled.")
+
+history = model.fit(X_train, y_train, epochs=5, batch_size=32, verbose=0)
+print("\\nModel trained. Check history for results.")
+</code></pre>
+                    </div>
+                    <h4>Knowledge Check: Module 3 Quiz</h4>
+                    <div class="quiz-container mb-4">
+                        <h4 class="font-semibold text-neon-green mb-3">Quiz 3: Deep Learning Fundamentals</h4>
+                        <div id="quiz3-questions"></div>
+                        <div id="quiz3-results" class="hidden mt-6 p-4 rounded-lg bg-terminal-code text-neon-green shadow-inner"></div>
+                        <button onclick="runQuiz(3)" class="mt-6 w-full action-button">Submit Quiz</button>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-10">
+                    <button onclick="previousModule()" class="action-button">Previous Module</button>
+                    <button id="next3" onclick="nextModule()" class="action-button next-button-locked">Next Module</button>
+                </div>
+            </section>
+
+            <!-- Module 4 Content -->
+            <section id="module4" class="module-view module-content">
+                <h2>MODULE 4: NATURAL LANGUAGE PROCESSING</h2>
+                <div class="prose text-neon-green max-w-none">
+                    <h3>Text Preprocessing</h3>
+                    <p>Natural Language Processing (NLP) is a subfield of AI that focuses on enabling computers to understand human language. <strong>Text Preprocessing</strong> is a crucial step before any NLP task.</p>
+                    <p>Key steps include: <strong>Tokenization</strong>, <strong>Lowercasing</strong>, <strong>Stop Word Removal</strong>, <strong>Stemming</strong> (a crude word-root reduction), and <strong>Lemmatization</strong> (a more sophisticated word-root reduction considering context).</p>
+                    <div class="bg-terminal-code p-4 rounded-lg border border-neon-green shadow-lg">
+                        <h4 class="font-bold mb-3 text-neon-green">Hands-on: NLP Basics</h4>
+                        <pre class="jupyter-code"><code>import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+
+sample_text = "Natural Language Processing (NLP) is a fascinating field."
+# Tokenization and Lowercasing
+text_lower = sample_text.lower()
+tokens = word_tokenize(text_lower)
+print(f"Tokens: {tokens}")
+
+# Removing Stop Words
+stop_words = set(stopwords.words('english'))
+filtered_tokens = [word for word in tokens if word.isalpha() and word not in stop_words]
+print(f"Filtered tokens: {filtered_tokens}")
+</code></pre>
+                    </div>
+                    <h4>Knowledge Check: Module 4 Quiz</h4>
+                    <div class="quiz-container mb-4">
+                        <h4 class="font-semibold text-neon-green mb-3">Quiz 4: NLP Basics</h4>
+                        <div id="quiz4-questions"></div>
+                        <div id="quiz4-results" class="hidden mt-6 p-4 rounded-lg bg-terminal-code text-neon-green shadow-inner"></div>
+                        <button onclick="runQuiz(4)" class="mt-6 w-full action-button">Submit Quiz</button>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-10">
+                    <button onclick="previousModule()" class="action-button">Previous Module</button>
+                    <button id="next4" onclick="nextModule()" class="action-button next-button-locked">Next Module</button>
+                </div>
+            </section>
+
+            <!-- Module 5 Content -->
+            <section id="module5" class="module-view module-content">
+                <h2>MODULE 5: COMPUTER VISION</h2>
+                <div class="prose text-neon-green max-w-none">
+                    <h3>Image Basics</h3>
+                    <p>Computer Vision (CV) is a field of AI that enables computers to "see" and interpret digital images and videos. An image is a grid of <strong>pixels</strong>, represented using color models like <strong>RGB</strong> with three channels (Red, Green, Blue).</p>
+                    <h3>Image Preprocessing</h3>
+                    <p><strong>Image Preprocessing</strong> includes: <strong>Resizing</strong>, <strong>Normalization</strong> (scaling pixel values), and <strong>Augmentation</strong> (creating new training examples).</p>
+                    <h4>Knowledge Check: Module 5 Quiz</h4>
+                    <div class="quiz-container mb-4">
+                        <h4 class="font-semibold text-neon-green mb-3">Quiz 5: Computer Vision</h4>
+                        <div id="quiz5-questions"></div>
+                        <div id="quiz5-results" class="hidden mt-6 p-4 rounded-lg bg-terminal-code text-neon-green shadow-inner"></div>
+                        <button onclick="runQuiz(5)" class="mt-6 w-full action-button">Submit Quiz</button>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-10">
+                    <button onclick="previousModule()" class="action-button">Previous Module</button>
+                    <button id="next5" onclick="nextModule()" class="action-button next-button-locked">Next Module</button>
+                </div>
+            </section>
+
+            <!-- Module 6 Content -->
+            <section id="module6" class="module-view module-content">
+                <h2>MODULE 6: ADVANCED TOPICS & CAPSTONE</h2>
+                <div class="prose text-neon-green max-w-none">
+                    <h3>Reinforcement Learning (RL)</h3>
+                    <p>This final module introduces several advanced and modern topics in AI and Machine Learning. <strong>Reinforcement Learning (RL)</strong> is a type of machine learning where an <strong>agent</strong> learns to make decisions by performing actions in an <strong>environment</strong> to maximize a cumulative <strong>reward</strong>.</p>
+                    <h3>Generative AI & MLOps</h3>
+                    <p><strong>Generative AI</strong> is a field focused on creating new, original content. Key models include <strong>Generative Adversarial Networks (GANs)</strong> and <strong>Large Language Models (LLMs)</strong>. <strong>MLOps</strong> combines ML, DevOps, and Data Engineering to streamline the entire machine learning lifecycle.</p>
+                    <h3>Capstone Project: Financial News Sentiment Dashboard</h3>
+                    <p>The <strong>Capstone Project</strong> is the final, hands-on component where you apply the knowledge and skills from all six modules to a single, comprehensive problem. You'll build an end-to-end Financial News Sentiment Dashboard, covering data acquisition, NLP, model training, and deployment.</p>
+                    <h4>Knowledge Check: Module 6 Quiz</h4>
+                    <div class="quiz-container mb-4">
+                        <h4 class="font-semibold text-neon-green mb-3">Quiz 6: Advanced Topics</h4>
+                        <div id="quiz6-questions"></div>
+                        <div id="quiz6-results" class="hidden mt-6 p-4 rounded-lg bg-terminal-code text-neon-green shadow-inner"></div>
+                        <button onclick="runQuiz(6)" class="mt-6 w-full action-button">Submit Quiz</button>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-10">
+                    <button onclick="previousModule()" class="action-button">Previous Module</button>
+                    <button id="next6" onclick="nextModule()" class="action-button next-button-locked">Finish Course</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        let currentModuleIndex = 0;
+        const modules = document.querySelectorAll('.module-view');
+        const progressBar = document.getElementById('progressBar');
+        const totalModules = modules.length;
+        const quizScores = {};
+        const passingScore = 0.8; // Changed to a fraction for easier calculation
+
+        const allQuestions = {
+            1: [
+                { question: "Which of the following is the broadest concept?", options: ["Deep Learning", "Artificial Intelligence (AI)", "Machine Learning (ML)", "Robotics"], correct: 1, explanation: "Artificial Intelligence is the overarching field, with Machine Learning as a subset and Deep Learning as a subset of ML." },
+                { question: "What is the primary goal of Supervised Learning?", options: ["To find hidden patterns in unlabeled data", "To learn from labeled data to make predictions on new data", "To learn by interacting with an environment through rewards and penalties", "To create new features from existing data"], correct: 1, explanation: "Supervised learning models are trained on labeled datasets, where each data point is tagged with a correct output." },
+                { question: "An algorithm that groups customers into segments based on their purchasing habits without any prior labels is an example of:", options: ["Supervised Learning", "Reinforcement Learning", "Unsupervised Learning", "Deep Learning"], correct: 2, explanation: "Unsupervised learning is used to find hidden patterns or structures within unlabeled data." },
+                { question: "What is the primary purpose of the NumPy library in an AI/ML environment?", options: ["To create interactive visualizations", "To manage software packages and environments", "To perform efficient numerical computations with multi-dimensional arrays", "To build and train deep neural networks"], correct: 2, explanation: "NumPy is a fundamental package for numerical computation in Python and provides support for large, multi-dimensional arrays and matrices." },
+                { question: "Which term is best described as 'training a machine to play a game by rewarding it for winning and penalizing it for losing'?", options: ["Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Transfer Learning"], correct: 2, explanation: "Reinforcement learning models learn by interacting with an environment and receiving rewards or penalties." }
+            ],
+            2: [
+                { question: "From Module 1: What is the relationship between AI, ML, and DL?", options: ["AI and ML are the same, with DL being a subset.", "ML is a subset of AI, and DL is a subset of ML.", "DL is a subset of AI, and ML is a subset of DL.", "They are three unrelated fields."], correct: 1, explanation: "AI is the broadest concept, followed by ML, and then DL as a more specialized subset of ML." },
+                { question: "What is the primary purpose of data preprocessing in machine learning?", options: ["To make the data look visually appealing in charts", "To prepare and transform raw data into a suitable format for ML algorithms", "To reduce the amount of data to save storage space", "To encrypt sensitive information in the dataset"], correct: 1, explanation: "Data preprocessing transforms raw data into a clean, structured format that ML algorithms can effectively use, improving model performance and reliability." },
+                { question: "Which metric is most appropriate for evaluating a regression model?", options: ["Accuracy", "Precision", "Mean Squared Error (MSE)", "F1 Score"], correct: 2, explanation: "Mean Squared Error (MSE) measures the average squared difference between predicted and actual values, making it suitable for regression tasks where we predict continuous values." },
+                { question: "What does the term 'feature engineering' refer to?", options: ["The process of selecting which machine learning algorithm to use", "Creating new features from existing data to improve model performance", "Engineering a system to automatically collect more data", "The process of tuning model hyperparameters"], correct: 1, explanation: "Feature engineering involves creating new features from existing data to help the model better understand patterns, which can significantly improve model performance." },
+                { question: "What is the difference between overfitting and underfitting?", options: ["Overfitting is when the model is too simple, underfitting is when it is too complex.", "Overfitting occurs on test data, while underfitting occurs on training data.", "Overfitting is when the model learns noise in the data, underfitting is when it fails to capture the underlying pattern.", "There is no difference; they are different terms for the same concept."], correct: 2, explanation: "Overfitting results in a model that performs well on training data but poorly on unseen data. Underfitting is when the model is too simple and performs poorly on both." }
+            ],
+            3: [
+                { question: "From Module 2: A confusion matrix is used to evaluate the performance of which type of model?", options: ["Regression", "Clustering", "Classification", "Anomaly Detection"], correct: 2, explanation: "A confusion matrix shows the number of true positives, false positives, true negatives, and false negatives for a classification model." },
+                { question: "What is the primary purpose of a neural network's activation function?", options: ["To add non-linearity to the network's output", "To speed up the training process", "To increase the number of layers", "To handle missing data"], correct: 0, explanation: "Activation functions introduce non-linearity, allowing the network to learn more complex, non-linear patterns in the data." },
+                { question: "Which algorithm is used in deep learning to efficiently update a neural network's weights during training?", options: ["K-Means", "Logistic Regression", "Backpropagation", "Decision Trees"], correct: 2, explanation: "Backpropagation is the key algorithm that calculates and propagates the error gradients backward through the network to update the weights." },
+                { question: "In a CNN, what is the main purpose of a 'convolutional layer'?", options: ["To reduce the spatial dimensions of the feature maps", "To flatten the input data into a single vector", "To extract features like edges and textures from the input image", "To apply a non-linear activation function to the data"], correct: 2, explanation: "Convolutional layers apply filters to the image to automatically learn and extract hierarchical features." },
+                { question: "What is a major benefit of using transfer learning?", options: ["It requires a larger dataset to achieve good performance.", "It makes the model less complex and easier to interpret.", "It significantly reduces training time and can lead to better performance with limited data.", "It is only used for unsupervised learning tasks."], correct: 2, explanation: "Transfer learning leverages a pre-trained model on a large dataset, allowing you to fine-tune it for a related task with much less data and computational resources." }
+            ],
+            4: [
+                { question: "From Module 3: What is the main purpose of a 'hidden layer' in a neural network?", options: ["To receive the raw input data", "To perform complex computations and transformations on the data", "To produce the final prediction", "To manage the network's overall structure"], correct: 1, explanation: "Hidden layers are where the primary computations happen, allowing the network to learn intricate patterns from the data." },
+                { question: "What is the main difference between stemming and lemmatization?", options: ["Stemming is a more accurate process that considers context.", "Lemmatization is faster but less accurate.", "Stemming is a crude process that often chops off the end of words, while lemmatization reduces words to their meaningful base form.", "They are two different names for the exact same process."], correct: 2, explanation: "Lemmatization is a more sophisticated process that uses a dictionary to find the root form, whereas stemming is a heuristic that may result in non-words." },
+                { question: "What is a 'word embedding'?", options: ["A method to count word frequencies", "A binary representation of a word", "A numerical vector that captures a word's meaning and relationships", "A list of stop words"], correct: 2, explanation: "Word embeddings allow machine learning models to understand the semantic relationships between words by representing them as dense vectors in a high-dimensional space." },
+                { question: "Which NLP task involves assigning a sentiment (e.g., positive, negative, neutral) to a piece of text?", options: ["Text Classification", "Machine Translation", "Sentiment Analysis", "Named Entity Recognition"], correct: 2, explanation: "Sentiment analysis is a specific type of text classification where the goal is to determine the emotional tone of the text." },
+                { question: "What is a key feature of the Transformer architecture?", options: ["It uses a single, massive recurrent layer.", "It relies on a self-attention mechanism to weigh the importance of different words.", "It is designed only for text generation tasks.", "It is the predecessor to simple RNNs."], correct: 1, explanation: "The self-attention mechanism is what makes the Transformer so effective at understanding context and relationships in long sequences of text." }
+            ],
+            5: [
+                { question: "From Module 4: What is the purpose of lemmatization?", options: ["To convert text into images for computer vision models.", "To reduce a word to its crude root form by chopping off its end.", "To remove common words like 'the' and 'a' from text.", "To reduce a word to its meaningful base form considering its context."], correct: 3, explanation: "Lemmatization is a sophisticated text preprocessing step that reduces words to their meaningful base or dictionary form, unlike stemming which is a crude process." },
+                { question: "What is the main function of an image's 'channels' in the RGB model?", options: ["To represent the image's resolution.", "To determine the image's brightness.", "To represent the intensity of red, green, and blue colors.", "To compress the image file size."], correct: 2, explanation: "In the RGB model, each channel corresponds to one of the primary colors (Red, Green, or Blue) and stores its intensity value for each pixel." },
+                { question: "Which image preprocessing technique helps prevent a model from overfitting to the training data?", options: ["Resizing", "Grayscale conversion", "Augmentation", "Normalization"], correct: 2, explanation: "Image augmentation creates new training examples by applying random transformations (like rotation or flipping) to existing images, increasing data diversity and helping the model generalize better." },
+                { question: "What is the key difference between Object Detection and Image Segmentation?", options: ["Object detection identifies and locates objects with a bounding box, while segmentation classifies each pixel.", "Object detection is only for video, while segmentation is for static images.", "Segmentation is an older technique than object detection.", "They are the same process, just with
