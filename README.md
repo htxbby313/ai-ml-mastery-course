@@ -123,4 +123,4 @@ For full details regarding the terms of use, please refer to the licensing agree
 For any questions, support, or business inquiries, please reach out to:
 
 AC Consulting
-oner@colemanholdingsllc.com
+owner@colemanholdingsllc.com
