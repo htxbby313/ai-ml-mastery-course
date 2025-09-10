@@ -1,6 +1,7 @@
 # AI & Machine Learning Mastery Course
 
-![Course Banner](https://img.imageboss.me/k/cover/24855799-73e4-4a46-86d1-42e1262d9481.jpeg)
+![Course Banner](<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/b410ff71-c58c-4ea6-89a9-f75a3174e914" />
+)
 
 ## Table of Contents
 
